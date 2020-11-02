@@ -1,0 +1,42 @@
+# NSgRNAShot
+
+Running NSgRNAShot is extremely easy and convenient. The demo folder contains one example to go through all steps in NSgRNAShot.
+
+Step 1: prepare the read count file
+
+Remember the following rules of a read count file:
+The read count file not include a header line of condition labels;
+The first column is the gRNA name;
+The second column is pre-selection gRNA count for per gRNA;
+The third column is post-selection gRNA count for per gRNA;
+
+As example:
+
+AAAAACACCAGCTGCGAACC	168	219
+AAAAGAACTGAGGTGGCCGT	914	994
+GCTGTGCTTTCCTTGGTTCC	220	301
+CCGAGGAATGAAGGTGGCAG	557	612
+
+Step 2: run the NSgRNAShot
+
+NSgRNAShot.R gRNA_count_file prefix_of_ouput
+
+Step 3: output results
+
+If successful, you should see files ".result.txt" and ".log.txt". The top lines of ".result.txt" are as follows:
+
+ACTCAACGTGACCACGCGCC	840	0	1034.92119129577	10	-6.69337710121368	-6.32082705069821	1
+GCTACGGAAGGCAGGGATGA	1073	34	1321.98861697662	34	-5.2810311979411	-5.13541666495136	1
+
+Each of the column is:
+1. gRNA name
+2. P1.count
+2. P10.count
+3. P1.normalize.count	
+4. P10.normalize.count
+6. Log2FC
+7. Log2FC.centered
+8. Label: 1 denote the FDR<0.1 of gRNA, 0 denote the gRNA not cause negative selection.
+
+For ".log.txt" file, it records the total gRNA number, the threshold value that can be used to distinguish if gRNA causes negative selection, 
+the number of gRNA of false positive (FDR<0 and log2FC>0), and the number of gRNA that cause negative selection (FDR<0.1 and log2FC<0).
