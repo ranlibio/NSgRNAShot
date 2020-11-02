@@ -1,5 +1,12 @@
-# NSgRNAShot
+About the code
+Title: NSgRNAShot
+Version: 1
+Date: 2020-11-02
+Description: This method (NSgRNAShot) will efficiently identify the gRNAs that leads to negative selections from the input read count file. 
+Author: Chao Wu <wuchao1984@zju.edu.cn>, Ran Li <ranli1993@zju.edu.cn>
+Depends: R (>= 3.6.0).
 
+#####################################################################################################
 Running NSgRNAShot is extremely easy and convenient. The demo folder contains one example to go through all steps in NSgRNAShot.
 
 Step 1: prepare the read count file
@@ -37,3 +44,8 @@ Each of the column is:
 
 For ".log.txt" file, it records the total gRNA number, the threshold value that can be used to distinguish if gRNA causes negative selection, 
 the number of gRNA of false positive (FDR<0 and log2FC>0), and the number of gRNA that cause negative selection (FDR<0.1 and log2FC<0).
+
+#######################################################################################################################
+How to contact?
+
+If you have any question or suggestion about NSgRNAShot, please contact with Ran Li (ranli1993@zju.edu.cn) and Chao Wu (wuchao1984@zju.edu.cn).
