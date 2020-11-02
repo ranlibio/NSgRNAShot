@@ -13,8 +13,6 @@ The third column is post-selection gRNA count for per gRNA;
 As example:
 
 AAAAACACCAGCTGCGAACC	168	219
-AAAAGAACTGAGGTGGCCGT	914	994
-
 
 Step 2: run the NSgRNAShot
 
