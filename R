@@ -1,0 +1,101 @@
+#!/usr/local/bin/R Rscript
+
+Args <- commandArgs(TRUE)
+
+#Remember the following rules of a read count file:
+#The read count file not include header line and has three columns;
+#The first column is the gRNA name;
+#The second column is pre-selection read count for gRNAs;
+#The third column is post-selection read count for gRNAs.
+#The demo folder contains one example to go through all steps in NSgRNAShot
+
+#read count tables of input file
+count <- read.table(Args[1],header = FALSE,row.names = 1)
+
+#The name of output and log file
+name <- Args[2]
+
+#gRNAs are filtered based on RPM (reads count per million) and normalize
+keep <- which(count[,1]*1000000/sum(count[,1])>1 | count[,2]*1000000/sum(count[,2])>1)
+count <- count[keep,]
+count_tmp <- count
+if(sum(count[,1])>=sum(count[,2])){
+  count[,2] <- count[,2]*(sum(count[,1])/sum(count[,2]))
+}else{
+  count[,1] <- count[,1]*(sum(count[,2])/sum(count[,1]))
+}
+n1 <- which(count[,1] <= 10)
+n2 <- which(count[,2] <= 10)
+count[n1,1] <- 10
+count[n2,2] <- 10
+
+#Calculate rank value for each gRNA.
+max_Value <- apply(count, 1, function(x){x[which.max(x)]})
+rank_Value <- rank(max_Value,ties.method = "min")
+quantile_Value <- rank_Value/max(rank_Value)
+
+#Normalzie log2FC based on rank value for each gRNA.
+logfc <- log2(count[,2]/count[,1])
+scale_logfc <- logfc*quantile_Value
+
+#The central value of log2FC distribution of gRNAs is normalzied to 0.
+upper_limit <- max(scale_logfc)
+lower_limit <- min(scale_logfc)
+center_pos <- 0
+center_len <- 0
+while((upper_limit-0.1)>=lower_limit)
+{
+  num <- length(which(scale_logfc<=upper_limit & scale_logfc>(upper_limit-0.1)))
+  if(num>=center_len) {center_len <- num;center_pos <- upper_limit-0.05}
+  upper_limit <- upper_limit-0.02
+}
+scale_logfc <- scale_logfc-center_pos
+
+outFile <- paste(name,".result.txt",sep = "")
+result <- cbind(count_tmp,count,logfc,scale_logfc)
+result <- result[order(result[,6],decreasing = FALSE),]
+scale_logfc <- result[,6]
+label <- matrix(0,nrow(count),1)
+
+#log file
+logFile <- paste(name,".log.txt",sep = "")
+
+#Identify the sgRNAs (FDR<0.1) that leads to negative selection
+initial_Value <- 0
+final_Value <- max(scale_logfc)
+stepSize <- 0.01
+stepCount <- (final_Value-initial_Value)/stepSize
+flag <- 0
+i <- 1
+for(i in 0:stepCount){
+  thres <- initial_Value+i*stepSize
+  lines_down <- which(scale_logfc<(-thres))
+  num_down <- length(which(scale_logfc<(-thres)))
+  lines_up <- which(scale_logfc>(thres))
+  num_up <- length(which(scale_logfc>(thres)))
+  ratio <- num_down/num_up
+  if(ratio>=10){
+    label[lines_down,1] <- 1
+    label[lines_up,1] <- 1
+    flag <- 1
+    break
+  }
+}
+
+if(flag==0){
+  lines_down <- 0
+  lines_up <- 0
+  num_down <- 0
+  num_up <- 0
+}
+sample_name <- rep(name,nrow(result))
+result <- cbind(result,label[,1],sample_name)
+
+#Ouput file
+write.table(result,file=outFile,quote = FALSE,sep = "\t",col.names = FALSE)
+
+#Log file
+cat("sgRNA number: ",nrow(count),sep = "\n",file = logFile)
+cat("threshold value: ",thres,sep = "\n",file = logFile,append = TRUE)
+cat("sgRNA up: ",num_up,sep = "\n",file = logFile,append = TRUE)
+cat("sgRNA down: ",num_down,sep = "\n",file = logFile,append = TRUE)
