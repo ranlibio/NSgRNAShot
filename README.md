@@ -25,8 +25,7 @@ Step 3: output results
 
 If successful, you should see files ".result.txt" and ".log.txt". The top lines of ".result.txt" are as follows:
 
-ACTCAACGTGACCACGCGCC	840	0	1034.92119129577	10	-6.69337710121368	-6.32082705069821	1
-GCTACGGAAGGCAGGGATGA	1073	34	1321.98861697662	34	-5.2810311979411	-5.13541666495136	1
+ACTCAACGTGACCACGCGCC	840	0	1034.92119129577	10	-6.69337710121368	-6.32082705069821	1 demo
 
 Each of the column is:
 1. gRNA name
@@ -37,6 +36,7 @@ Each of the column is:
 6. Log2FC
 7. Log2FC.centered
 8. Label: 1 denote the FDR<0.1 of gRNA, 0 denote the gRNA not cause negative selection.
+9. The prefix of output file
 
 For ".log.txt" file, it records the total gRNA number, the threshold value that can be used to distinguish if gRNA causes negative selection, 
 the number of gRNA of false positive (FDR<0 and log2FC>0), and the number of gRNA that cause negative selection (FDR<0.1 and log2FC<0).
